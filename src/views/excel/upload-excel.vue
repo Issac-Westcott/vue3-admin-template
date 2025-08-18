@@ -1,22 +1,22 @@
 <template>
   <div class="app-container">
-    <upload-excel-component 
-      :on-success="handleSuccess" 
-      :before-upload="beforeUpload" 
+    <upload-excel-component
+      :on-success="handleSuccess"
+      :before-upload="beforeUpload"
     />
-    
-    <el-table 
+
+    <el-table
       v-if="tableData.length > 0"
-      :data="tableData" 
-      border 
-      highlight-current-row 
+      :data="tableData"
+      border
+      highlight-current-row
       style="width: 100%;margin-top:20px;"
     >
-      <el-table-column 
-        v-for="item in tableHeader" 
-        :key="item" 
-        :prop="item" 
-        :label="item" 
+      <el-table-column
+        v-for="item in tableHeader"
+        :key="item"
+        :prop="item"
+        :label="item"
       />
     </el-table>
   </div>

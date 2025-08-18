@@ -3,8 +3,8 @@
     <label class="radio-label">Book Type: </label>
     <el-select 
       :model-value="modelValue" 
-      @update:model-value="$emit('update:modelValue', $event)"
       style="width:120px;"
+      @update:model-value="$emit('update:modelValue', $event)"
     >
       <el-option
         v-for="item in options"

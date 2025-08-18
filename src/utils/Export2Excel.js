@@ -49,7 +49,7 @@ export function exportJsonToExcel({
       return { wch: val.toString().length }
     }))
     
-    let result = colWidth[0]
+    const result = colWidth[0]
     for (let i = 1; i < colWidth.length; i += 1) {
       for (let j = 0; j < colWidth[i].length; j += 1) {
         if (result[j].wch < colWidth[i][j].wch) {

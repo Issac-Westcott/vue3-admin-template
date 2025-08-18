@@ -3,10 +3,10 @@
     <label class="radio-label" style="padding-left:0;">Filename: </label>
     <el-input 
       :model-value="modelValue" 
-      @update:model-value="$emit('update:modelValue', $event)"
-      placeholder="Please enter the file name (default excel-list)" 
+      placeholder="Please enter the file name (default excel-list)"
       style="width:345px;" 
       prefix-icon="Document" 
+      @update:model-value="$emit('update:modelValue', $event)" 
     />
   </div>
 </template>

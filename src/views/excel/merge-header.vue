@@ -4,9 +4,9 @@
       :loading="downloadLoading" 
       style="margin-bottom:20px" 
       type="primary" 
+      :icon="Document"
       @click="handleDownload"
     >
-      <el-icon><Document /></el-icon>
       Export
     </el-button>
 
@@ -30,7 +30,7 @@
             {{ scope.row.title }}
           </template>
         </el-table-column>
-        <el-table-column label="Author" width="110" align="center">
+        <el-table-column label="Author" width="150" align="center">
           <template #default="scope">
             <el-tag>{{ scope.row.author }}</el-tag>
           </template>
@@ -43,8 +43,10 @@
       </el-table-column>
       <el-table-column align="center" label="Date" width="220">
         <template #default="scope">
-          <el-icon><Clock /></el-icon>
-          <span>{{ formatTime(scope.row.timestamp) }}</span>
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <el-icon style="margin-right: 5px;"><Clock /></el-icon>
+            <span>{{ formatTime(scope.row.timestamp) }}</span>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -52,8 +54,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Document, Clock } from '@element-plus/icons-vue'
+import { onMounted, ref } from 'vue'
+import { Clock, Document } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { exportJsonToExcel } from '@/utils/Export2Excel'
 

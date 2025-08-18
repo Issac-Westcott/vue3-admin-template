@@ -4,7 +4,7 @@
     <transition enter-active-class="screen-locker-lock" append-to-body leave-active-class="screen-locker-unlock">
       <div v-if="open" class="screen-locker">
         <div class="screen-avatar">
-          <el-avatar round :size="128" src="https://github.jzfai.top/file/images/nav-right-logo.gif" />
+          <el-avatar round :size="128" src="@/assets/nav-right-logo.gif" />
           <div class="screen-nickname">Vue3 Admin Plus</div>
         </div>
         <div ref="slider" class="screen-slider">

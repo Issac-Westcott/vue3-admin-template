@@ -92,7 +92,7 @@ export const settings = {
    * i18n setting default language
    * en/zh
    * */
-  defaultLanguage: 'en',
+  defaultLanguage: 'zh',
   /*
    *  default theme
    * base-theme/lighting-theme/dark-theme
@@ -102,7 +102,7 @@ export const settings = {
    * setting default defaultSize
    * large / default /small
    * */
-  defaultSize: 'small',
+  defaultSize: 'default',
   /*
    * vite.config.js base config
    * such as

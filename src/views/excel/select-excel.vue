@@ -1,27 +1,29 @@
 <template>
   <div class="app-container">
-    <el-input 
-      v-model="filename" 
-      placeholder="Please enter the file name (default excel-list)" 
-      style="width:350px;" 
-      prefix-icon="Document" 
-    />
-    <el-button 
-      :loading="downloadLoading" 
-      style="margin-bottom:20px" 
-      type="primary" 
-      @click="handleDownload"
-    >
-      <el-icon><Document /></el-icon>
-      Export Selected Items
-    </el-button>
-    <a 
-      href="https://panjiachen.github.io/vue-element-admin-site/feature/component/excel.html" 
-      target="_blank"
-      style="margin-left:15px;"
-    >
-      <el-tag type="info">Documentation</el-tag>
-    </a>
+    <div style="margin-bottom:20px;">
+      <el-input 
+        v-model="filename" 
+        placeholder="Please enter the file name (default excel-list)" 
+        style="width:350px;" 
+        prefix-icon="Document" 
+      />
+      <el-button 
+        :loading="downloadLoading" 
+        style="margin-left:10px;" 
+        type="primary" 
+        @click="handleDownload"
+      >
+        <el-icon><Document /></el-icon>
+        Export Selected Items
+      </el-button>
+      <a 
+        href="https://panjiachen.github.io/vue-element-admin-site/feature/component/excel.html" 
+        target="_blank"
+        style="margin-left:15px;"
+      >
+        <el-tag type="info">Documentation</el-tag>
+      </a>
+    </div>
     
     <el-table
       ref="multipleTable"

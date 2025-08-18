@@ -22,6 +22,7 @@
     "elLoading": true,
     "elMessage": true,
     "elNotify": true,
+    "exportJsonToExcel": true,
     "filterAsyncRouter": true,
     "filterAsyncRouterByCodes": true,
     "filterAsyncRoutesByMenuList": true,

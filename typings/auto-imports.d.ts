@@ -23,6 +23,7 @@ declare global {
   const elLoading: typeof import('../src/hooks/use-element')['elLoading']
   const elMessage: typeof import('../src/hooks/use-element')['elMessage']
   const elNotify: typeof import('../src/hooks/use-element')['elNotify']
+  const exportJsonToExcel: typeof import('../src/utils/Export2Excel.js')['exportJsonToExcel']
   const filterAsyncRouter: typeof import('../src/hooks/use-permission')['filterAsyncRouter']
   const filterAsyncRouterByCodes: typeof import('../src/hooks/use-permission')['filterAsyncRouterByCodes']
   const filterAsyncRoutesByMenuList: typeof import('../src/hooks/use-permission')['filterAsyncRoutesByMenuList']

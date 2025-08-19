@@ -174,6 +174,13 @@ export const constantRoutes: RouterTypes = [
         component: () => import('@/views/table/question-table.vue'),
         name: 'QuestionTable',
         meta: { title: '技术支持申请' } // 更改菜单显示标题
+      },
+      {
+        path: 'question-detail/:id',
+        component: () => import('@/views/table/question-detail.vue'),
+        name: 'QuestionDetail',
+        meta: { title: '问题详情' },
+        hidden: true // 隐藏在菜单中，只能通过编程方式访问
       }
     ]
   },

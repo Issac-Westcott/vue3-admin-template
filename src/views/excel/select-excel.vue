@@ -29,7 +29,7 @@
       ref="multipleTable"
       v-loading="listLoading"
       :data="list"
-      element-loading-text="拼命加载中"
+      :element-loading-text="t('common.loading')"
       border
       fit
       highlight-current-row
@@ -73,6 +73,9 @@ import { onMounted, ref } from 'vue'
 import { Clock, Document } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { exportJsonToExcel } from '@/utils/Export2Excel'
+import { i18n } from '@/lang'
+
+const { t } = i18n.global
 
 // 响应式数据
 const list = ref(null)

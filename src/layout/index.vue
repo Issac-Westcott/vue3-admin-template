@@ -2,10 +2,12 @@
   <div :class="classObj" class="layout-wrapper">
     <!--left side-->
     <Sidebar v-if="settings.showLeftMenu" class="sidebar-container" />
+    <!--fixed top navbar-->
+    <Navbar v-if="settings.showTopNavbar" class="fixed-navbar" />
+    <!--fixed tags view-->
+    <TagsView v-if="settings.showTagsView" class="fixed-tags-view" />
     <!--right container-->
     <div class="main-container">
-      <Navbar v-if="settings.showTopNavbar" />
-      <TagsView v-if="settings.showTagsView" />
       <AppMain />
     </div>
   </div>
@@ -29,11 +31,30 @@ resizeHandler()
 </script>
 
 <style lang="scss" scoped>
+.fixed-navbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: var(--side-bar-width);
+  z-index: 1000;
+  transition: left var(--sideBar-switch-duration);
+}
+
+.fixed-tags-view {
+  position: fixed;
+  top: var(--nav-bar-height);
+  right: 0;
+  left: var(--side-bar-width);
+  z-index: 999;
+  transition: left var(--sideBar-switch-duration);
+}
+
 .main-container {
   min-height: 100%;
   transition: margin-left var(--sideBar-switch-duration);
   margin-left: var(--side-bar-width);
   position: relative;
+  padding-top: calc(var(--nav-bar-height) + var(--tag-view-height));
 }
 .sidebar-container {
   transition: width var(--sideBar-switch-duration);
@@ -55,6 +76,12 @@ resizeHandler()
   .main-container {
     margin-left: 54px !important;
   }
+  .fixed-navbar {
+    left: 54px !important;
+  }
+  .fixed-tags-view {
+    left: 54px !important;
+  }
 }
 .hideSidebar {
   .sidebar-container {
@@ -62,6 +89,12 @@ resizeHandler()
   }
   .main-container {
     margin-left: 0;
+  }
+  .fixed-navbar {
+    left: 0 !important;
+  }
+  .fixed-tags-view {
+    left: 0 !important;
   }
 }
 </style>

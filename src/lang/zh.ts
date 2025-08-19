@@ -68,6 +68,9 @@ export default {
     'unocss using': 'unocss使用',
     'global var': '全局静态变量'
   },
+  common: {
+    loading: '加载中'
+  },
   'error-log': {
     log: '错误日志',
     pageUrl: '页面路径',

@@ -25,7 +25,7 @@
     <el-table
       v-loading="listLoading"
       :data="list"
-      element-loading-text="Loading..."
+      :element-loading-text="t('common.loading')"
       border
       fit
       highlight-current-row
@@ -70,6 +70,9 @@ import FilenameOption from './components/FilenameOption.vue'
 import AutoWidthOption from './components/AutoWidthOption.vue'
 import BookTypeOption from './components/BookTypeOption.vue'
 import { exportJsonToExcel } from '@/utils/Export2Excel'
+import { i18n } from '@/lang'
+
+const { t } = i18n.global
 
 // 响应式数据
 const list = ref(null)

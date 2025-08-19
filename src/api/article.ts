@@ -26,3 +26,12 @@ export const updateArticle = (data: any) => {
     data
   })
 }
+
+// 获取问题列表
+export const getQuestionList = (params: any) => {
+  return axiosReq({
+    url: '/mock/question/list',
+    method: 'get',
+    params
+  })
+}

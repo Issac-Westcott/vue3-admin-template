@@ -25,8 +25,15 @@
               cancel
             </el-button>
           </template>
-          <el-tooltip v-else :content="row.question" placement="top" :disabled="!isTextOverflow(row.question, 200)">
-            <span class="text-ellipsis">{{ row.question }}</span>
+          <el-tooltip v-else :content="row.question" placement="top" :disabled="!isTextOverflow(row.question, 180)">
+            <el-link
+              type="primary"
+              class="question-link text-ellipsis"
+              @click="goToDetail(row)"
+              :underline="false"
+            >
+              {{ row.question }}
+            </el-link>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -36,7 +43,7 @@
           <template v-if="row.edit">
             <el-input v-model="row.typeValue" class="edit-input" size="small" />
           </template>
-          <el-tooltip v-else :content="row.typeValue" placement="top" :disabled="!isTextOverflow(row.typeValue, 120)">
+          <el-tooltip v-else :content="row.typeValue" placement="top" :disabled="!isTextOverflow(row.typeValue, 100)">
             <span class="text-ellipsis">{{ row.typeValue }}</span>
           </el-tooltip>
         </template>
@@ -53,7 +60,7 @@
           <template v-if="row.edit">
             <el-input v-model="row.lineValue" class="edit-input" size="small" />
           </template>
-          <el-tooltip v-else :content="row.lineValue" placement="top" :disabled="!isTextOverflow(row.lineValue, 120)">
+          <el-tooltip v-else :content="row.lineValue" placement="top" :disabled="!isTextOverflow(row.lineValue, 100)">
             <span class="text-ellipsis">{{ row.lineValue }}</span>
           </el-tooltip>
         </template>
@@ -68,7 +75,7 @@
             v-else
             :content="row.owningSystem"
             placement="top"
-            :disabled="!isTextOverflow(row.owningSystem, 150)"
+            :disabled="!isTextOverflow(row.owningSystem, 130)"
           >
             <span class="text-ellipsis">{{ row.owningSystem }}</span>
           </el-tooltip>
@@ -80,7 +87,7 @@
           <template v-if="row.edit">
             <el-input v-model="row.project" class="edit-input" size="small" />
           </template>
-          <el-tooltip v-else :content="row.project" placement="top" :disabled="!isTextOverflow(row.project, 150)">
+          <el-tooltip v-else :content="row.project" placement="top" :disabled="!isTextOverflow(row.project, 130)">
             <span class="text-ellipsis">{{ row.project }}</span>
           </el-tooltip>
         </template>
@@ -95,7 +102,7 @@
             v-else
             :content="row.platformValue"
             placement="top"
-            :disabled="!isTextOverflow(row.platformValue, 150)"
+            :disabled="!isTextOverflow(row.platformValue, 130)"
           >
             <span class="text-ellipsis">{{ row.platformValue }}</span>
           </el-tooltip>
@@ -113,7 +120,7 @@
           <template v-if="row.edit">
             <el-input v-model="row.proposer" class="edit-input" size="small" />
           </template>
-          <el-tooltip v-else :content="row.proposer" placement="top" :disabled="!isTextOverflow(row.proposer, 120)">
+          <el-tooltip v-else :content="row.proposer" placement="top" :disabled="!isTextOverflow(row.proposer, 100)">
             <span class="text-ellipsis">{{ row.proposer }}</span>
           </el-tooltip>
         </template>
@@ -128,7 +135,7 @@
             v-else
             :content="row.proposerType"
             placement="top"
-            :disabled="!isTextOverflow(row.proposerType, 120)"
+            :disabled="!isTextOverflow(row.proposerType, 100)"
           >
             <span class="text-ellipsis">{{ row.proposerType }}</span>
           </el-tooltip>
@@ -144,7 +151,7 @@
             v-else
             :content="row.proposerDepartment"
             placement="top"
-            :disabled="!isTextOverflow(row.proposerDepartment, 150)"
+            :disabled="!isTextOverflow(row.proposerDepartment, 130)"
           >
             <span class="text-ellipsis">{{ row.proposerDepartment }}</span>
           </el-tooltip>
@@ -156,7 +163,7 @@
           <template v-if="row.edit">
             <el-input v-model="row.solver" class="edit-input" size="small" />
           </template>
-          <el-tooltip v-else :content="row.solver" placement="top" :disabled="!isTextOverflow(row.solver, 120)">
+          <el-tooltip v-else :content="row.solver" placement="top" :disabled="!isTextOverflow(row.solver, 100)">
             <span class="text-ellipsis">{{ row.solver }}</span>
           </el-tooltip>
         </template>
@@ -178,101 +185,51 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { Check, Edit, Refresh } from '@element-plus/icons-vue'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { Edit, Check, Close, Search } from '@element-plus/icons-vue'
 import { parseTime } from '@/utils/date-util'
-import { elMessage } from '@/hooks/use-element'
+import { getQuestionList } from '@/api/article'
 
-// 响应式数据
-const list = ref<any[]>([])
+const router = useRouter()
+
+const list = ref([])
 const listLoading = ref(true)
 const listQuery = ref({
   page: 1,
-  limit: 10
+  limit: 20
 })
 
-// 检测文本是否超出指定宽度
-const isTextOverflow = (text: string, maxWidth: number) => {
+// 检测文本是否会溢出
+const isTextOverflow = (text, maxWidth) => {
   if (!text) return false
-  // 简单估算：中文字符约14px，英文字符约8px，考虑padding等因素
-  const chineseChars = (text.match(/[\u4E00-\u9FA5]/g) || []).length
-  const otherChars = text.length - chineseChars
-  const estimatedWidth = chineseChars * 14 + otherChars * 8 + 20 // 20px for padding
-  return estimatedWidth > maxWidth
+  // 简单的字符长度检测，考虑中文字符占用更多空间
+  const chineseCharCount = (text.match(/[\u4E00-\u9FA5]/g) || []).length
+  const otherCharCount = text.length - chineseCharCount
+  const estimatedWidth = chineseCharCount * 14 + otherCharCount * 8 // 中文字符约14px，英文字符约8px
+  return estimatedWidth > maxWidth - 40 // 减去padding和其他空间
 }
 
 // 状态过滤器
-const statusFilter = (status: string) => {
-  const statusMap: Record<string, string> = {
-    pending: 'warning',
-    processing: 'info',
-    resolved: 'success',
-    closed: 'danger'
+const statusFilter = (status) => {
+  const statusMap = {
+    '未处理': 'danger',
+    '处理中': 'warning', 
+    '关闭': 'info'
   }
   return statusMap[status]
 }
 
-// 模拟数据
-const mockData = [
-  {
-    id: 1,
-    question: '系统登录异常问题',
-    typeValue: '技术问题',
-    levelValue: 3,
-    lineValue: '技术条线',
-    owningSystem: '用户管理系统',
-    project: '用户中心项目',
-    platformValue: 'Vue3+Element Plus',
-    status: 'pending',
-    proposer: '张三',
-    proposerType: '内部员工',
-    proposerDepartment: '技术部',
-    solver: '李四',
-    createTime: Date.now() - 86400000
-  },
-  {
-    id: 2,
-    question: '数据同步延迟问题',
-    typeValue: '性能问题',
-    levelValue: 2,
-    lineValue: '数据条线',
-    owningSystem: '数据同步系统',
-    project: '数据中台项目',
-    platformValue: 'Spring Boot',
-    status: 'processing',
-    proposer: '王五',
-    proposerType: '外部合作方',
-    proposerDepartment: '产品部',
-    solver: '赵六',
-    createTime: Date.now() - 172800000
-  },
-  {
-    id: 3,
-    question: '界面显示错乱',
-    typeValue: 'UI问题',
-    levelValue: 1,
-    lineValue: '前端条线',
-    owningSystem: '前端展示系统',
-    project: '用户界面项目',
-    platformValue: 'React',
-    status: 'resolved',
-    proposer: '孙七',
-    proposerType: '内部员工',
-    proposerDepartment: '设计部',
-    solver: '周八',
-    createTime: Date.now() - 259200000
-  }
-]
+
 
 // 获取列表数据
 const getList = async () => {
   listLoading.value = true
   try {
-    // 模拟API调用
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const items = mockData
-    list.value = items.map((v: any) => {
+    const response = await getQuestionList(listQuery.value)
+    const items = response.data?.list || []
+    list.value = items.map((v) => {
       v.edit = false
       v.originalQuestion = v.question
       v.originalTypeValue = v.typeValue
@@ -288,48 +245,28 @@ const getList = async () => {
     })
   } catch (error) {
     console.error('获取列表失败:', error)
+    ElMessage.error('获取数据失败')
   } finally {
     listLoading.value = false
   }
 }
 
 // 取消编辑
-const cancelEdit = (row: any) => {
-  row.question = row.originalQuestion
-  row.typeValue = row.originalTypeValue
-  row.lineValue = row.originalLineValue
-  row.owningSystem = row.originalOwningSystem
-  row.project = row.originalProject
-  row.platformValue = row.originalPlatformValue
-  row.proposer = row.originalProposer
-  row.proposerType = row.originalProposerType
-  row.proposerDepartment = row.originalProposerDepartment
-  row.solver = row.originalSolver
+const cancelEdit = (row) => {
   row.edit = false
-  elMessage('内容已恢复为原始值', 'warning')
+  row.originalQuestion = row.question
 }
 
 // 确认编辑
-const confirmEdit = async (row: any) => {
+const confirmEdit = (row) => {
   row.edit = false
   row.originalQuestion = row.question
-  row.originalTypeValue = row.typeValue
-  row.originalLineValue = row.lineValue
-  row.originalOwningSystem = row.owningSystem
-  row.originalProject = row.project
-  row.originalPlatformValue = row.platformValue
-  row.originalProposer = row.proposer
-  row.originalProposerType = row.proposerType
-  row.originalProposerDepartment = row.proposerDepartment
-  row.originalSolver = row.solver
-  try {
-    // 模拟API调用
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    elMessage('编辑成功', 'success')
-  } catch (error) {
-    console.error('更新失败:', error)
-    elMessage('更新失败', 'error')
-  }
+  ElMessage.success('编辑成功')
+}
+
+// 跳转到详情页面
+const goToDetail = (row) => {
+  router.push(`/table/question-detail/${row.id}`)
 }
 
 // 组件挂载时获取数据
@@ -337,19 +274,7 @@ onMounted(() => {
   getList()
 })
 
-// 导出所有需要在模板中使用的变量和函数
-defineExpose({
-  list,
-  listLoading,
-  statusFilter,
-  cancelEdit,
-  confirmEdit,
-  isTextOverflow,
-  parseTime,
-  Check,
-  Edit,
-  Refresh
-})
+// 所有变量和函数已在setup中定义，无需额外导出
 </script>
 
 <style scoped>
@@ -401,5 +326,28 @@ defineExpose({
   white-space: nowrap;
   vertical-align: middle;
   line-height: 1.5;
+  cursor: pointer;
+}
+
+/* Tooltip样式优化 */
+:deep(.el-tooltip__trigger) {
+  width: 100%;
+  display: inline-block;
+}
+
+:deep(.el-tooltip__popper) {
+  max-width: 300px;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+.question-link {
+  max-width: 100%;
+  font-weight: 500;
+}
+
+.question-link:hover {
+  color: #409eff;
+  text-decoration: underline;
 }
 </style>

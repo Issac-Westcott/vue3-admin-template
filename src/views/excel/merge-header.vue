@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
-    <el-button 
-      :loading="downloadLoading" 
-      style="margin-bottom:20px" 
-      type="primary" 
+    <el-button
+      :loading="downloadLoading"
+      style="margin-bottom:20px"
+      type="primary"
       :icon="Document"
       @click="handleDownload"
     >
@@ -25,7 +25,7 @@
         </template>
       </el-table-column>
       <el-table-column label="Main Information" align="center">
-        <el-table-column label="Title">
+        <el-table-column label="Title" align="center">
           <template #default="scope">
             {{ scope.row.title }}
           </template>
@@ -121,7 +121,7 @@ const handleDownload = () => {
     ElMessage.warning('No data to export')
     return
   }
-  
+
   downloadLoading.value = true
   try {
     const multiHeader = [['Id', 'Main Information', '', '', 'Date']]
@@ -129,7 +129,7 @@ const handleDownload = () => {
     const filterVal = ['id', 'title', 'author', 'pageviews', 'display_time']
     const data = formatJson(filterVal, list.value)
     const merges = ['A1:A2', 'B1:D1', 'E1:E2']
-    
+
     exportJsonToExcel({
       multiHeader,
       header,

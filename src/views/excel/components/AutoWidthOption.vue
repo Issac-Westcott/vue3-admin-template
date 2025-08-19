@@ -1,8 +1,8 @@
 <template>
   <div style="display:inline-block;">
     <label class="radio-label">Cell Auto-Width: </label>
-    <el-radio-group 
-      :model-value="modelValue" 
+    <el-radio-group
+      :model-value="modelValue"
       @update:model-value="$emit('update:modelValue', $event)"
     >
       <el-radio :label="true" border>

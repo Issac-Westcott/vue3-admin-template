@@ -1,8 +1,8 @@
 <template>
   <div style="display:inline-block;">
     <label class="radio-label">Book Type: </label>
-    <el-select 
-      :model-value="modelValue" 
+    <el-select
+      :model-value="modelValue"
       style="width:120px;"
       @update:model-value="$emit('update:modelValue', $event)"
     >

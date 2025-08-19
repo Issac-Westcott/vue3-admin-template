@@ -152,6 +152,31 @@ export const constantRoutes: RouterTypes = [
       }
     ]
   },
+  {
+    path: '/table',
+    component: Layout,
+    redirect: '/table/inline-edit-table',
+    name: 'Table',
+    alwaysShow: true,
+    meta: {
+      title: 'Table',
+      icon: 'table'
+    },
+    children: [
+      {
+        path: 'inline-edit-table',
+        component: () => import('@/views/table/inline-edit-table.vue'),
+        name: 'InlineEditTable',
+        meta: { title: 'Inline Edit Table' }
+      },
+      {
+        path: 'question-table',
+        component: () => import('@/views/table/question-table.vue'),
+        name: 'QuestionTable',
+        meta: { title: 'Question Table' }
+      }
+    ]
+  },
   basicDemo,
   { path: "/:pathMatch(.*)", redirect: "/404", hidden: true }
 ]

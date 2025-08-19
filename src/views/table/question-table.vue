@@ -3,7 +3,7 @@
     <el-table
       v-loading="listLoading"
       :data="list"
-      element-loading-text="拼命加载中"
+      element-loading-text="加载中"
       border
       fit
       highlight-current-row
@@ -30,7 +30,9 @@
               cancel
             </el-button>
           </template>
-          <span v-else>{{ row.question }}</span>
+          <el-tooltip v-else :content="row.question" placement="top" :disabled="!isTextOverflow(row.question, 200)">
+            <span class="text-ellipsis">{{ row.question }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -39,7 +41,9 @@
           <template v-if="row.edit">
             <el-input v-model="row.typeValue" class="edit-input" size="small" />
           </template>
-          <span v-else>{{ row.typeValue }}</span>
+          <el-tooltip v-else :content="row.typeValue" placement="top" :disabled="!isTextOverflow(row.typeValue, 120)">
+            <span class="text-ellipsis">{{ row.typeValue }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -54,7 +58,9 @@
           <template v-if="row.edit">
             <el-input v-model="row.lineValue" class="edit-input" size="small" />
           </template>
-          <span v-else>{{ row.lineValue }}</span>
+          <el-tooltip v-else :content="row.lineValue" placement="top" :disabled="!isTextOverflow(row.lineValue, 120)">
+            <span class="text-ellipsis">{{ row.lineValue }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -63,7 +69,9 @@
           <template v-if="row.edit">
             <el-input v-model="row.owningSystem" class="edit-input" size="small" />
           </template>
-          <span v-else>{{ row.owningSystem }}</span>
+          <el-tooltip v-else :content="row.owningSystem" placement="top" :disabled="!isTextOverflow(row.owningSystem, 150)">
+            <span class="text-ellipsis">{{ row.owningSystem }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -72,7 +80,9 @@
           <template v-if="row.edit">
             <el-input v-model="row.project" class="edit-input" size="small" />
           </template>
-          <span v-else>{{ row.project }}</span>
+          <el-tooltip v-else :content="row.project" placement="top" :disabled="!isTextOverflow(row.project, 150)">
+            <span class="text-ellipsis">{{ row.project }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -81,7 +91,9 @@
           <template v-if="row.edit">
             <el-input v-model="row.platformValue" class="edit-input" size="small" />
           </template>
-          <span v-else>{{ row.platformValue }}</span>
+          <el-tooltip v-else :content="row.platformValue" placement="top" :disabled="!isTextOverflow(row.platformValue, 150)">
+            <span class="text-ellipsis">{{ row.platformValue }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -96,7 +108,9 @@
           <template v-if="row.edit">
             <el-input v-model="row.proposer" class="edit-input" size="small" />
           </template>
-          <span v-else>{{ row.proposer }}</span>
+          <el-tooltip v-else :content="row.proposer" placement="top" :disabled="!isTextOverflow(row.proposer, 120)">
+            <span class="text-ellipsis">{{ row.proposer }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -105,7 +119,9 @@
           <template v-if="row.edit">
             <el-input v-model="row.proposerType" class="edit-input" size="small" />
           </template>
-          <span v-else>{{ row.proposerType }}</span>
+          <el-tooltip v-else :content="row.proposerType" placement="top" :disabled="!isTextOverflow(row.proposerType, 120)">
+            <span class="text-ellipsis">{{ row.proposerType }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -114,7 +130,9 @@
           <template v-if="row.edit">
             <el-input v-model="row.proposerDepartment" class="edit-input" size="small" />
           </template>
-          <span v-else>{{ row.proposerDepartment }}</span>
+          <el-tooltip v-else :content="row.proposerDepartment" placement="top" :disabled="!isTextOverflow(row.proposerDepartment, 150)">
+            <span class="text-ellipsis">{{ row.proposerDepartment }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -123,7 +141,9 @@
           <template v-if="row.edit">
             <el-input v-model="row.solver" class="edit-input" size="small" />
           </template>
-          <span v-else>{{ row.solver }}</span>
+          <el-tooltip v-else :content="row.solver" placement="top" :disabled="!isTextOverflow(row.solver, 120)">
+            <span class="text-ellipsis">{{ row.solver }}</span>
+          </el-tooltip>
         </template>
       </el-table-column>
 
@@ -160,7 +180,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Check, Edit, Refresh } from '@element-plus/icons-vue'
 import { parseTime } from '@/utils/date-util'
 import { elMessage } from '@/hooks/use-element'
@@ -172,6 +192,16 @@ const listQuery = ref({
   page: 1,
   limit: 10
 })
+
+// 检测文本是否超出指定宽度
+const isTextOverflow = (text: string, maxWidth: number) => {
+  if (!text) return false
+  // 简单估算：中文字符约14px，英文字符约8px，考虑padding等因素
+  const chineseChars = (text.match(/[\u4E00-\u9FA5]/g) || []).length
+  const otherChars = text.length - chineseChars
+  const estimatedWidth = chineseChars * 14 + otherChars * 8 + 20 // 20px for padding
+  return estimatedWidth > maxWidth
+}
 
 // 状态过滤器
 const statusFilter = (status: string) => {
@@ -315,27 +345,13 @@ defineExpose({
   statusFilter,
   cancelEdit,
   confirmEdit,
+  isTextOverflow,
   parseTime,
   Check,
   Edit,
   Refresh
 })
 
-// 确保所有变量和函数在模板中可用
-const exposedVars = {
-  list,
-  listLoading,
-  statusFilter,
-  cancelEdit,
-  confirmEdit,
-  parseTime,
-  Check,
-  Edit,
-  Refresh
-}
-
-// 将变量绑定到全局作用域
-Object.assign(globalThis, exposedVars)
 </script>
 
 <style scoped>
@@ -363,5 +379,29 @@ Object.assign(globalThis, exposedVars)
 /* 表格水平滚动样式 */
 :deep(.el-table__body-wrapper) {
   overflow-x: auto;
+}
+
+/* 表格行高设置 */
+:deep(.el-table .el-table__row) {
+  height: auto;
+  min-height: 48px;
+}
+
+:deep(.el-table td.el-table__cell) {
+  padding: 12px 0;
+  height: auto;
+  min-height: 48px;
+  vertical-align: middle;
+}
+
+/* 文本截断样式 */
+.text-ellipsis {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+  line-height: 1.5;
 }
 </style>

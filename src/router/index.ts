@@ -47,7 +47,7 @@ export const constantRoutes: RouterTypes = [
   {
     path: '/setting-switch',
     component: Layout,
-    alwaysShow:true,
+    alwaysShow: true,
     meta: { title: 'Setting Switch', elSvgIcon: 'Setting' },
     children: [
       {
@@ -173,18 +173,16 @@ export const constantRoutes: RouterTypes = [
         path: 'question-table',
         component: () => import('@/views/table/question-table.vue'),
         name: 'QuestionTable',
-        meta: { title: 'Question Table' }
+        meta: { title: '技术支持申请' } // 更改菜单显示标题
       }
     ]
   },
   basicDemo,
-  { path: "/:pathMatch(.*)", redirect: "/404", hidden: true }
+  { path: '/:pathMatch(.*)', redirect: '/404', hidden: true }
 ]
 
 //角色和code数组动态路由
-export const roleCodeRoutes: RouterTypes = [
-
-]
+export const roleCodeRoutes: RouterTypes = []
 /**
  * asyncRoutes
  * the routes that need to be dynamically loaded based on user roles

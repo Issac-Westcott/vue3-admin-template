@@ -7,7 +7,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
+      style="width: 100%"
       :scroll-x="true"
     >
       <el-table-column align="center" label="序号" width="80" fixed="left">
@@ -20,12 +20,7 @@
         <template #default="{ row }">
           <template v-if="row.edit">
             <el-input v-model="row.question" class="edit-input" size="small" />
-            <el-button
-              class="cancel-btn"
-              size="small"
-              type="warning"
-              @click="cancelEdit(row)"
-            >
+            <el-button class="cancel-btn" size="small" type="warning" @click="cancelEdit(row)">
               <el-icon><Refresh /></el-icon>
               cancel
             </el-button>
@@ -69,7 +64,12 @@
           <template v-if="row.edit">
             <el-input v-model="row.owningSystem" class="edit-input" size="small" />
           </template>
-          <el-tooltip v-else :content="row.owningSystem" placement="top" :disabled="!isTextOverflow(row.owningSystem, 150)">
+          <el-tooltip
+            v-else
+            :content="row.owningSystem"
+            placement="top"
+            :disabled="!isTextOverflow(row.owningSystem, 150)"
+          >
             <span class="text-ellipsis">{{ row.owningSystem }}</span>
           </el-tooltip>
         </template>
@@ -91,7 +91,12 @@
           <template v-if="row.edit">
             <el-input v-model="row.platformValue" class="edit-input" size="small" />
           </template>
-          <el-tooltip v-else :content="row.platformValue" placement="top" :disabled="!isTextOverflow(row.platformValue, 150)">
+          <el-tooltip
+            v-else
+            :content="row.platformValue"
+            placement="top"
+            :disabled="!isTextOverflow(row.platformValue, 150)"
+          >
             <span class="text-ellipsis">{{ row.platformValue }}</span>
           </el-tooltip>
         </template>
@@ -119,7 +124,12 @@
           <template v-if="row.edit">
             <el-input v-model="row.proposerType" class="edit-input" size="small" />
           </template>
-          <el-tooltip v-else :content="row.proposerType" placement="top" :disabled="!isTextOverflow(row.proposerType, 120)">
+          <el-tooltip
+            v-else
+            :content="row.proposerType"
+            placement="top"
+            :disabled="!isTextOverflow(row.proposerType, 120)"
+          >
             <span class="text-ellipsis">{{ row.proposerType }}</span>
           </el-tooltip>
         </template>
@@ -130,7 +140,12 @@
           <template v-if="row.edit">
             <el-input v-model="row.proposerDepartment" class="edit-input" size="small" />
           </template>
-          <el-tooltip v-else :content="row.proposerDepartment" placement="top" :disabled="!isTextOverflow(row.proposerDepartment, 150)">
+          <el-tooltip
+            v-else
+            :content="row.proposerDepartment"
+            placement="top"
+            :disabled="!isTextOverflow(row.proposerDepartment, 150)"
+          >
             <span class="text-ellipsis">{{ row.proposerDepartment }}</span>
           </el-tooltip>
         </template>
@@ -155,24 +170,8 @@
 
       <el-table-column align="center" label="操作" width="120" fixed="right">
         <template #default="{ row }">
-          <el-button
-            v-if="row.edit"
-            type="success"
-            size="small"
-            :icon="Check"
-            @click="confirmEdit(row)"
-          >
-            Ok
-          </el-button>
-          <el-button
-            v-else
-            type="primary"
-            size="small"
-            :icon="Edit"
-            @click="row.edit = !row.edit"
-          >
-            Edit
-          </el-button>
+          <el-button v-if="row.edit" type="success" size="small" :icon="Check" @click="confirmEdit(row)">Ok</el-button>
+          <el-button v-else type="primary" size="small" :icon="Edit" @click="row.edit = !row.edit">Edit</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -271,7 +270,7 @@ const getList = async () => {
   listLoading.value = true
   try {
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
     const items = mockData
     list.value = items.map((v: any) => {
       v.edit = false
@@ -325,7 +324,7 @@ const confirmEdit = async (row: any) => {
   row.originalSolver = row.solver
   try {
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     elMessage('编辑成功', 'success')
   } catch (error) {
     console.error('更新失败:', error)
@@ -351,7 +350,6 @@ defineExpose({
   Edit,
   Refresh
 })
-
 </script>
 
 <style scoped>

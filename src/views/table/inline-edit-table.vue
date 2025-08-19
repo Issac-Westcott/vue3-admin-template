@@ -7,7 +7,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
+      style="width: 100%"
     >
       <el-table-column align="center" label="ID" width="80">
         <template #default="{ row }">
@@ -46,12 +46,7 @@
         <template #default="{ row }">
           <template v-if="row.edit">
             <el-input v-model="row.title" class="edit-input" size="small" />
-            <el-button
-              class="cancel-btn"
-              size="small"
-              type="warning"
-              @click="cancelEdit(row)"
-            >
+            <el-button class="cancel-btn" size="small" type="warning" @click="cancelEdit(row)">
               <el-icon><Refresh /></el-icon>
               cancel
             </el-button>
@@ -62,24 +57,8 @@
 
       <el-table-column align="center" label="Actions" width="120">
         <template #default="{ row }">
-          <el-button
-            v-if="row.edit"
-            type="success"
-            size="small"
-            :icon="Check"
-            @click="confirmEdit(row)"
-          >
-            Ok
-          </el-button>
-          <el-button
-            v-else
-            type="primary"
-            size="small"
-            :icon="Edit"
-            @click="row.edit = !row.edit"
-          >
-            Edit
-          </el-button>
+          <el-button v-if="row.edit" type="success" size="small" :icon="Check" @click="confirmEdit(row)">Ok</el-button>
+          <el-button v-else type="primary" size="small" :icon="Edit" @click="row.edit = !row.edit">Edit</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -87,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Check, Edit, Refresh } from '@element-plus/icons-vue'
 import { fetchList, updateArticle } from '@/api/article'
 import { parseTime } from '@/utils/date-util'

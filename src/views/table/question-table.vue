@@ -1,5 +1,95 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" role="main">
+    <!-- 查询表单区域 -->
+    <div class="filter-container">
+      <el-card class="box-card">
+        <div class="search-form" role="search" aria-label="问题查询表单">
+          <el-row :gutter="20">
+            <el-col :span="4">
+              <el-input
+                v-model="searchForm.question"
+                placeholder="标题关键词"
+                clearable
+                aria-label="输入标题关键词进行搜索"
+                tabindex="1"
+              />
+            </el-col>
+            <el-col :span="3">
+              <el-input
+                v-model="searchForm.typeValue"
+                placeholder="问题类别"
+                clearable
+                aria-label="输入问题类别进行筛选"
+                tabindex="2"
+              />
+            </el-col>
+            <el-col :span="3">
+              <el-input
+                v-model="searchForm.lineValue"
+                placeholder="所属条线"
+                clearable
+                aria-label="输入所属条线进行筛选"
+                tabindex="3"
+              />
+            </el-col>
+            <el-col :span="3">
+              <el-input
+                v-model="searchForm.owningSystem"
+                placeholder="所属系统"
+                clearable
+                aria-label="输入所属系统进行筛选"
+                tabindex="4"
+              />
+            </el-col>
+            <el-col :span="3">
+              <el-input
+                v-model="searchForm.proposer"
+                placeholder="提出人"
+                clearable
+                aria-label="输入提出人姓名进行筛选"
+                tabindex="5"
+              />
+            </el-col>
+            <el-col :span="3">
+              <el-select
+                v-model="searchForm.status"
+                placeholder="问题状态"
+                clearable
+                style="width: 100%"
+                aria-label="选择问题状态进行筛选"
+                tabindex="6"
+              >
+                <el-option label="未处理" value="未处理" />
+                <el-option label="处理中" value="处理中" />
+                <el-option label="关闭" value="关闭" />
+              </el-select>
+            </el-col>
+            <el-col :span="5">
+              <el-button 
+                type="primary" 
+                :icon="Search" 
+                @click="handleSearch"
+                aria-label="执行查询操作"
+                tabindex="7"
+              >
+                查询
+              </el-button>
+              <el-button 
+                type="success" 
+                :icon="Plus" 
+                @click="handleCreate"
+                aria-label="创建新问题"
+                tabindex="8"
+              >
+                新建
+              </el-button>
+            </el-col>
+          </el-row>
+        </div>
+      </el-card>
+    </div>
+
+    <!-- 表格区域 -->
     <el-table
       v-loading="listLoading"
       :data="list"
@@ -9,18 +99,37 @@
       highlight-current-row
       style="width: 100%"
       :scroll-x="true"
+      role="table"
+      aria-label="问题列表表格"
+      aria-describedby="table-description"
+      tabindex="9"
     >
-      <el-table-column align="center" label="序号" width="80" fixed="left">
-        <template #default="{ row }">
-          <span>{{ row.id }}</span>
+      <div id="table-description" class="sr-only">包含问题标题、类别、优先级、状态等信息的数据表格，支持编辑和查看详情</div>
+      <el-table-column align="center" label="序号" width="80" fixed="left" header-align="center">
+        <template #default="{ row, $index }">
+          <span role="cell" :aria-describedby="`row-${$index}-id`">{{ row.id }}</span>
+          <span :id="`row-${$index}-id`" class="sr-only">第{{ row.id }}行</span>
         </template>
       </el-table-column>
 
-      <el-table-column min-width="200px" label="标题" align="center" fixed="left">
-        <template #default="{ row }">
+      <el-table-column min-width="200px" label="标题" align="center" fixed="left" header-align="center">
+        <template #default="{ row, $index }">
           <template v-if="row.edit">
-            <el-input v-model="row.question" class="edit-input" size="small" />
-            <el-button class="cancel-btn" size="small" type="warning" @click="cancelEdit(row)">
+            <el-input 
+              v-model="row.question" 
+              class="edit-input" 
+              size="small" 
+              :aria-label="`编辑第${$index + 1}行的问题标题`"
+              :tabindex="100 + $index * 10 + 1"
+            />
+            <el-button 
+              class="cancel-btn" 
+              size="small" 
+              type="warning" 
+              @click="cancelEdit(row)"
+              :aria-label="`取消编辑第${$index + 1}行`"
+              :tabindex="100 + $index * 10 + 2"
+            >
               <el-icon><Refresh /></el-icon>
               cancel
             </el-button>
@@ -31,6 +140,9 @@
               class="question-link text-ellipsis"
               :underline="false"
               @click="goToDetail(row)"
+              :aria-label="`查看问题详情：${row.question}`"
+              :tabindex="100 + $index * 10 + 1"
+              role="button"
             >
               {{ row.question }}
             </el-link>
@@ -175,12 +287,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作" width="120" fixed="right">
-        <template #default="{ row }">
-          <el-button v-if="row.edit" type="success" size="small" :icon="Check" @click="confirmEdit(row)">Ok</el-button>
-          <el-button v-else type="primary" size="small" :icon="Edit" @click="row.edit = !row.edit">Edit</el-button>
-        </template>
-      </el-table-column>
+
     </el-table>
   </div>
 </template>
@@ -188,17 +295,29 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Check, Close, Edit, Search } from '@element-plus/icons-vue'
+import { Check, Close, Edit, Search, Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { parseTime } from '@/utils/date-util'
 import { getQuestionList } from '@/api/article'
 
 const router = useRouter()
 
 const list = ref([])
+const originalList = ref([]) // 保存原始数据
 const listLoading = ref(true)
 const listQuery = ref({
   page: 1,
   limit: 20
+})
+
+// 搜索表单数据
+const searchForm = ref({
+  question: '',
+  typeValue: '',
+  lineValue: '',
+  owningSystem: '',
+  proposer: '',
+  status: ''
 })
 
 // 检测文本是否会溢出
@@ -229,7 +348,7 @@ const getList = async () => {
   try {
     const response = await getQuestionList(listQuery.value)
     const items = response.data?.list || []
-    list.value = items.map((v) => {
+    const processedItems = items.map((v) => {
       v.edit = false
       v.originalQuestion = v.question
       v.originalTypeValue = v.typeValue
@@ -243,12 +362,64 @@ const getList = async () => {
       v.originalSolver = v.solver
       return v
     })
+    originalList.value = processedItems // 保存原始数据
+    list.value = processedItems // 显示数据
   } catch (error) {
     console.error('获取列表失败:', error)
     ElMessage.error('获取数据失败')
   } finally {
     listLoading.value = false
   }
+}
+
+// 搜索功能
+const handleSearch = () => {
+  const form = searchForm.value
+  let filteredData = originalList.value
+
+  // 根据各个字段进行筛选
+  if (form.question) {
+    filteredData = filteredData.filter(item => 
+      item.question && item.question.toLowerCase().includes(form.question.toLowerCase())
+    )
+  }
+  
+  if (form.typeValue) {
+    filteredData = filteredData.filter(item => 
+      item.typeValue && item.typeValue.toLowerCase().includes(form.typeValue.toLowerCase())
+    )
+  }
+  
+  if (form.lineValue) {
+    filteredData = filteredData.filter(item => 
+      item.lineValue && item.lineValue.toLowerCase().includes(form.lineValue.toLowerCase())
+    )
+  }
+  
+  if (form.owningSystem) {
+    filteredData = filteredData.filter(item => 
+      item.owningSystem && item.owningSystem.toLowerCase().includes(form.owningSystem.toLowerCase())
+    )
+  }
+  
+  if (form.proposer) {
+    filteredData = filteredData.filter(item => 
+      item.proposer && item.proposer.toLowerCase().includes(form.proposer.toLowerCase())
+    )
+  }
+  
+  if (form.status) {
+    filteredData = filteredData.filter(item => 
+      item.status === form.status
+    )
+  }
+
+  list.value = filteredData
+}
+
+// 新建功能（暂时保留）
+const handleCreate = () => {
+  ElMessage.info('新建功能待开发')
 }
 
 // 取消编辑
@@ -277,7 +448,44 @@ onMounted(() => {
 // 所有变量和函数已在setup中定义，无需额外导出
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+/* 查询表单样式 */
+.filter-container {
+  margin-bottom: 20px;
+}
+
+.box-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.search-form {
+  padding: 10px 0;
+}
+
+.search-form .el-input,
+.search-form .el-select {
+  width: 100%;
+}
+
+.search-form .el-button {
+  margin-right: 10px;
+}
+
+/* 调整状态下拉框箭头位置 */
+.search-form :deep(.el-select .el-input__wrapper) {
+  padding-right: 32px; /* 给文字留出空间 */
+}
+.search-form :deep(.el-select .el-input__suffix) {
+  right: 8px;
+  height: 100%;
+  display: flex;
+  align-items: center; /* 垂直居中箭头 */
+}
+.search-form :deep(.el-select .el-input__suffix .el-select__caret) {
+  margin-top: 0; /* 防止 caret 漂浮 */
+}
+
 .edit-input {
   padding-right: 100px;
 }
@@ -287,7 +495,7 @@ onMounted(() => {
   top: 10px;
 }
 .priority-star {
-  color: #f7ba2a;
+  color: #d93025; /* 提高对比度 */
   margin-right: 2px;
 }
 
@@ -344,10 +552,148 @@ onMounted(() => {
 .question-link {
   max-width: 100%;
   font-weight: 500;
+  color: #1a73e8; /* 提高对比度 */
+  text-decoration: none;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #1557b0;
+    text-decoration: underline;
+  }
+
+  &:focus {
+    outline: 2px solid #4285f4;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }
 
-.question-link:hover {
-  color: #409eff;
-  text-decoration: underline;
+/* 无障碍访问样式 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 焦点状态增强 */
+:deep(.el-input__wrapper) {
+  transition: all 0.2s ease;
+  
+  &:focus-within {
+    box-shadow: 0 0 0 2px #4285f4;
+    border-color: #4285f4;
+  }
+}
+
+:deep(.el-select) {
+  .el-input__wrapper:focus-within {
+    box-shadow: 0 0 0 2px #4285f4;
+    border-color: #4285f4;
+  }
+}
+
+:deep(.el-button) {
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: 2px solid #4285f4;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+  }
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* 表格无障碍访问增强 */
+:deep(.el-table) {
+  th {
+    background-color: #f5f7fa;
+    color: #303133;
+    font-weight: 600;
+  }
+  
+  tr:hover {
+    background-color: #f5f7fa;
+  }
+  
+  .el-table__cell {
+    border-color: #dcdfe6;
+  }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .question-link {
+    color: #000080;
+    
+    &:hover {
+      color: #000040;
+    }
+  }
+  
+  .priority-star {
+    color: #8b0000;
+  }
+  
+  :deep(.el-button) {
+    border-width: 2px;
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .filter-container {
+    .search-form {
+      padding: 15px;
+      
+      .el-row {
+        .el-col {
+          margin-bottom: 10px;
+        }
+      }
+    }
+  }
+  
+  :deep(.el-table) {
+    font-size: 14px;
+    
+    .el-table__cell {
+      padding: 8px 5px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-container {
+    .search-form {
+      padding: 10px;
+    }
+  }
+  
+  :deep(.el-table) {
+    font-size: 12px;
+    
+    .el-table__cell {
+      padding: 6px 3px;
+    }
+  }
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 </style>

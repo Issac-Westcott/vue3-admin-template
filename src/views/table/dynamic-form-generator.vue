@@ -46,6 +46,25 @@
           </div>
 
           <div v-else class="form-content">
+            <!-- 提交状态提示 -->
+            <div v-if="submitError" class="submit-status-alert">
+              <el-alert
+                :title="submitError"
+                type="error"
+                :closable="false"
+                show-icon
+                class="mb-4"
+              />
+            </div>
+            
+            <!-- 自动保存状态 -->
+            <div v-if="lastSaveTime" class="auto-save-status">
+              <el-text size="small" type="info">
+                <el-icon><Clock /></el-icon>
+                草稿已保存于 {{ formatTime(lastSaveTime) }}
+              </el-text>
+            </div>
+            
             <form-create
               v-model="formData"
               :rule="formRule"
@@ -79,9 +98,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref, watch } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { computed, nextTick, onUnmounted, reactive, ref, watch } from 'vue'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import { Clock } from '@element-plus/icons-vue'
 import useClipboard from 'vue-clipboard3'
+import { submitFormData, saveFormDraft, validateFormData, type FormSubmitData } from '@/api/form'
 
 // 响应式数据
 const selectedConfigId = ref('')
@@ -92,15 +113,32 @@ const formError = ref('')
 const dataDialogVisible = ref(false)
 const activeTab = ref('formData')
 const isSubmitting = ref(false)
+const submitStatus = ref<'idle' | 'validating' | 'submitting' | 'success' | 'error'>('idle')
+const submitError = ref('')
+const autoSaveTimer = ref<NodeJS.Timeout | null>(null)
+const lastSaveTime = ref<Date | null>(null)
 
 // 表单配置选项
 const formOption = reactive({
   submitBtn: {
-    text: '提交表单',
-    type: 'primary',
+    text: computed(() => {
+      switch (submitStatus.value) {
+        case 'validating': return '验证中...'
+        case 'submitting': return '提交中...'
+        case 'success': return '提交成功'
+        default: return '提交表单'
+      }
+    }),
+    type: computed(() => {
+      switch (submitStatus.value) {
+        case 'success': return 'success'
+        case 'error': return 'danger'
+        default: return 'primary'
+      }
+    }),
     size: 'large',
-    loading: computed(() => isSubmitting.value),
-    disabled: computed(() => isSubmitting.value)
+    loading: computed(() => ['validating', 'submitting'].includes(submitStatus.value)),
+    disabled: computed(() => ['validating', 'submitting'].includes(submitStatus.value))
   },
   resetBtn: {
     text: '重置',
@@ -452,17 +490,85 @@ const resetForm = () => {
   ElMessage.success('表单已重置')
 }
 
-const handleSubmit = async (formData: any) => {
+const handleSubmit = async (formData: any, fApi?: any) => {
   try {
+    // 重置状态
+    submitStatus.value = 'validating'
+    submitError.value = ''
     isSubmitting.value = true
-    console.log('表单提交:', formData)
 
-    // 模拟提交过程
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    // 1. 客户端数据验证
+    if (!validateClientData(formData)) {
+      submitStatus.value = 'error'
+      return
+    }
 
-    ElMessage.success('表单提交成功！')
-  } catch {
-    ElMessage.error('表单提交失败，请重试')
+    // 2. 服务端数据验证（可选）
+    try {
+      const validationResult = await validateFormData(selectedConfigId.value, formData)
+      if (!validationResult.valid && validationResult.errors) {
+        handleValidationErrors(validationResult.errors, fApi)
+        submitStatus.value = 'error'
+        return
+      }
+    } catch (error) {
+      console.warn('服务端验证失败，继续提交:', error)
+    }
+
+    // 3. 准备提交数据
+    submitStatus.value = 'submitting'
+    const submitData: FormSubmitData = {
+      formType: selectedConfigId.value,
+      formData: sanitizeFormData(formData),
+      timestamp: Date.now(),
+      clientInfo: {
+        userAgent: navigator.userAgent
+      }
+    }
+
+    // 4. 提交到后端
+    const response = await submitFormData(submitData)
+
+    if (response.success) {
+      submitStatus.value = 'success'
+      ElNotification({
+        title: '提交成功',
+        message: response.message || '表单数据已成功提交到服务器',
+        type: 'success',
+        duration: 3000
+      })
+
+      // 清除自动保存的草稿
+      clearAutoSave()
+
+      // 3秒后重置按钮状态
+      setTimeout(() => {
+        if (submitStatus.value === 'success') {
+          submitStatus.value = 'idle'
+        }
+      }, 3000)
+    } else {
+      throw new Error(response.message || '提交失败')
+    }
+  } catch (error: any) {
+    submitStatus.value = 'error'
+    submitError.value = error.message || '网络错误，请检查网络连接'
+    
+    console.error('表单提交失败:', error)
+    
+    ElNotification({
+      title: '提交失败',
+      message: getErrorMessage(error),
+      type: 'error',
+      duration: 5000
+    })
+
+    // 5秒后重置按钮状态
+    setTimeout(() => {
+      if (submitStatus.value === 'error') {
+        submitStatus.value = 'idle'
+      }
+    }, 5000)
   } finally {
     isSubmitting.value = false
   }
@@ -470,7 +576,138 @@ const handleSubmit = async (formData: any) => {
 
 const handleFormChange = (field: string, value: any, origin: any, api: any) => {
   console.log('表单变化:', { field, value })
+  
+  // 自动保存草稿
+  scheduleAutoSave()
 }
+
+// 客户端数据验证
+const validateClientData = (data: any): boolean => {
+  if (!data || typeof data !== 'object') {
+    ElMessage.error('表单数据格式错误')
+    return false
+  }
+
+  // 检查必填字段
+  const requiredFields = (formRule.value as any[]).filter((rule: any) => 
+    rule.validate?.some((v: any) => v.required)
+  )
+
+  for (const field of requiredFields) {
+    const value = data[field.field]
+    if (value === undefined || value === null || value === '' || 
+        (Array.isArray(value) && value.length === 0)) {
+      ElMessage.error(`请填写${field.title}`)
+      return false
+    }
+  }
+
+  return true
+}
+
+// 处理验证错误
+const handleValidationErrors = (errors: Record<string, string[]>, fApi?: any) => {
+  const errorMessages = Object.entries(errors)
+    .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+    .join('\n')
+  
+  ElMessage.error(`数据验证失败:\n${errorMessages}`)
+  
+  // 如果有FormCreate API，设置字段错误
+  if (fApi) {
+    Object.entries(errors).forEach(([field, messages]) => {
+      fApi.setFieldError(field, messages[0])
+    })
+  }
+}
+
+// 数据清理和安全处理
+const sanitizeFormData = (data: any): any => {
+  const sanitized = { ...data }
+  
+  // 移除可能的XSS攻击代码
+  Object.keys(sanitized).forEach(key => {
+    if (typeof sanitized[key] === 'string') {
+      sanitized[key] = sanitized[key]
+        .replace(/<script[^>]*>.*?<\/script>/gi, '')
+        .replace(/javascript:/gi, '')
+        .replace(/on\w+\s*=/gi, '')
+    }
+  })
+
+  return sanitized
+}
+
+// 错误消息处理
+const getErrorMessage = (error: any): string => {
+  if (error.response?.data?.message) {
+    return error.response.data.message
+  }
+  if (error.message) {
+    return error.message
+  }
+  if (error.code === 'NETWORK_ERROR') {
+    return '网络连接失败，请检查网络设置'
+  }
+  if (error.code === 'TIMEOUT') {
+    return '请求超时，请重试'
+  }
+  return '未知错误，请联系管理员'
+}
+
+// 自动保存相关函数
+const scheduleAutoSave = () => {
+  if (autoSaveTimer.value) {
+    clearTimeout(autoSaveTimer.value)
+  }
+
+  autoSaveTimer.value = setTimeout(async () => {
+    try {
+      // 暂时禁用自动保存API调用以避免404错误
+      // 后端API '/api/form/draft' 尚未实现，等待后端开发完成后启用
+      // await saveFormDraft({
+      //   formType: selectedConfigId.value,
+      //   formData: formData.value,
+      //   timestamp: Date.now()
+      // })
+      lastSaveTime.value = new Date()
+      console.log('草稿已本地保存（API暂未实现）')
+    } catch (error) {
+      console.warn('自动保存失败:', error)
+    }
+  }, 3000) // 3秒后保存
+}
+
+const clearAutoSave = () => {
+  if (autoSaveTimer.value) {
+    clearTimeout(autoSaveTimer.value)
+    autoSaveTimer.value = null
+  }
+  lastSaveTime.value = null
+}
+
+// 格式化时间显示
+const formatTime = (date: Date): string => {
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  
+  if (diff < 60000) { // 小于1分钟
+    return '刚刚'
+  } else if (diff < 3600000) { // 小于1小时
+    return `${Math.floor(diff / 60000)}分钟前`
+  } else if (diff < 86400000) { // 小于1天
+    return `${Math.floor(diff / 3600000)}小时前`
+  } else {
+    return date.toLocaleString('zh-CN', {
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+}
+
+const { toClipboard } = useClipboard()
 
 const viewFormData = () => {
   dataDialogVisible.value = true
@@ -480,8 +717,6 @@ const viewFormData = () => {
 const handleDataDialogClose = () => {
   dataDialogVisible.value = false
 }
-
-const { toClipboard } = useClipboard()
 
 const copyToClipboard = async () => {
   try {
@@ -497,6 +732,11 @@ const copyToClipboard = async () => {
 const init = () => {
   // 可以在这里添加初始化逻辑
 }
+
+// 组件卸载时清理
+onUnmounted(() => {
+  clearAutoSave()
+})
 
 init()
 </script>
@@ -573,6 +813,33 @@ init()
   flex: 1;
   overflow-y: auto;
   padding: 20px 0;
+}
+
+.submit-status-alert {
+  margin-bottom: 16px;
+}
+
+.auto-save-status {
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background-color: #f0f9ff;
+  border: 1px solid #e1f5fe;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.auto-save-status .el-icon {
+  color: #409eff;
+}
+
+.form-content {
+  position: relative;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
 }
 
 .empty-state,

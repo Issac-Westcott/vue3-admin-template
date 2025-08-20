@@ -8,7 +8,7 @@
 
     <!-- 详情内容 -->
     <div v-if="questionDetail" class="detail-content">
-      <el-card class="detail-card">
+      <el- class="detail-card">
         <div class="detail-grid">
           <!-- 左列 -->
           <div class="detail-column">
@@ -16,14 +16,14 @@
               <span class="detail-label">问题标题：</span>
               <span class="detail-value">{{ questionDetail.question }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">问题类别：</span>
               <span class="detail-value">
                 <el-tag type="info">{{ questionDetail.typeValue }}</el-tag>
               </span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">优先级：</span>
               <span class="detail-value">
@@ -31,22 +31,22 @@
                 <span class="priority-text">({{ questionDetail.levelValue }}级)</span>
               </span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">所属条线：</span>
               <span class="detail-value">{{ questionDetail.lineValue }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">所属系统：</span>
               <span class="detail-value">{{ questionDetail.owningSystem }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">所属项目：</span>
               <span class="detail-value">{{ questionDetail.project }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">关联框架/平台：</span>
               <span class="detail-value">
@@ -54,7 +54,7 @@
               </span>
             </div>
           </div>
-          
+
           <!-- 右列 -->
           <div class="detail-column">
             <div class="detail-item">
@@ -63,42 +63,41 @@
                 <el-tag :type="getStatusType(questionDetail.status)">{{ getStatusText(questionDetail.status) }}</el-tag>
               </span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">提出人：</span>
               <span class="detail-value">{{ questionDetail.proposer }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">所属公司：</span>
               <span class="detail-value">{{ questionDetail.proposerType }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">所属部门：</span>
               <span class="detail-value">{{ questionDetail.proposerDepartment }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">解决人：</span>
               <span class="detail-value">{{ questionDetail.solver || '待分配' }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">提出时间：</span>
               <span class="detail-value">{{ parseTime(questionDetail.createTime) }}</span>
             </div>
-            
+
             <div class="detail-item">
               <span class="detail-label">最后更新：</span>
               <span class="detail-value">{{ parseTime(questionDetail.updateTime || questionDetail.createTime) }}</span>
             </div>
           </div>
         </div>
-      </el-card>
-      
+      </el-
       <!-- 问题描述 -->
-      <el-card class="detail-card description-card">
+      <el- class="detail-card description-card">
         <template #header>
           <div class="card-header">
             <span>问题描述</span>
@@ -107,8 +106,7 @@
         <div class="description-content">
           {{ questionDetail.description || '暂无详细描述' }}
         </div>
-      </el-card>
-      
+      </el-
       <!-- 解决方案 -->
       <el-card class="detail-card solution-card">
         <template #header>
@@ -120,7 +118,7 @@
           {{ questionDetail.solution || '暂无解决方案' }}
         </div>
       </el-card>
-      
+
       <!-- 操作按钮 -->
       <div class="action-buttons">
         <el-button type="primary" :icon="Edit" @click="editQuestion">编辑问题</el-button>
@@ -128,7 +126,7 @@
         <el-button type="warning" :icon="Clock" @click="processQuestion" v-if="questionDetail.status === 'pending'">开始处理</el-button>
       </div>
     </div>
-    
+
     <!-- 加载状态 -->
     <div v-else class="loading-container">
       <el-skeleton :rows="8" animated />

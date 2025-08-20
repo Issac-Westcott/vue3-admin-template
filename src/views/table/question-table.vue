@@ -68,18 +68,18 @@
               <el-button 
                 type="primary" 
                 :icon="Search" 
-                @click="handleSearch"
                 aria-label="执行查询操作"
                 tabindex="7"
+                @click="handleSearch"
               >
                 查询
               </el-button>
               <el-button 
                 type="success" 
                 :icon="Plus" 
-                @click="handleCreate"
                 aria-label="创建新问题"
                 tabindex="8"
+                @click="handleCreate"
               >
                 新建
               </el-button>
@@ -126,9 +126,9 @@
               class="cancel-btn" 
               size="small" 
               type="warning" 
-              @click="cancelEdit(row)"
               :aria-label="`取消编辑第${$index + 1}行`"
               :tabindex="100 + $index * 10 + 2"
+              @click="cancelEdit(row)"
             >
               <el-icon><Refresh /></el-icon>
               cancel
@@ -139,10 +139,10 @@
               type="primary"
               class="question-link text-ellipsis"
               :underline="false"
-              @click="goToDetail(row)"
               :aria-label="`查看问题详情：${row.question}`"
               :tabindex="100 + $index * 10 + 1"
               role="button"
+              @click="goToDetail(row)"
             >
               {{ row.question }}
             </el-link>
@@ -295,7 +295,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Check, Close, Edit, Search, Plus } from '@element-plus/icons-vue'
+import { Check, Close, Edit, Plus, Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { parseTime } from '@/utils/date-util'
 import { getQuestionList } from '@/api/article'
@@ -417,9 +417,9 @@ const handleSearch = () => {
   list.value = filteredData
 }
 
-// 新建功能（暂时保留）
+// 新建功能
 const handleCreate = () => {
-  ElMessage.info('新建功能待开发')
+  router.push('/table/question-form')
 }
 
 // 取消编辑

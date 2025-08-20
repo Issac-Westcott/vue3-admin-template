@@ -102,7 +102,7 @@ import { computed, nextTick, onUnmounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { Clock } from '@element-plus/icons-vue'
 import useClipboard from 'vue-clipboard3'
-import { submitFormData, saveFormDraft, validateFormData, type FormSubmitData } from '@/api/form'
+import { type FormSubmitData, saveFormDraft, submitFormData, validateFormData } from '@/api/form'
 
 // 响应式数据
 const selectedConfigId = ref('')

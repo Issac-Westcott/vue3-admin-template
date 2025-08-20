@@ -167,7 +167,7 @@ export const constantRoutes: RouterTypes = [
         path: 'inline-edit-table',
         component: () => import('@/views/table/inline-edit-table.vue'),
         name: 'InlineEditTable',
-        meta: { title: 'Inline Edit Table' }
+        meta: { title: '内联编辑表格' }
       },
       {
         path: 'question-table',
@@ -186,7 +186,7 @@ export const constantRoutes: RouterTypes = [
         path: 'dynamic-form-generator',
         component: () => import('@/views/table/dynamic-form-generator.vue'),
         name: 'DynamicFormGenerator',
-        meta: { title: '动态表单生成器', icon: 'form' }
+        meta: { title: '动态表单生成器' }
       }
     ]
   },

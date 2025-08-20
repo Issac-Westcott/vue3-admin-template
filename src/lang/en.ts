@@ -36,7 +36,9 @@ export default {
     'Permission Switch': '',
     'Role Index': '',
     'Code Index': '',
-    'Button Permission': ''
+    'Button Permission': '',
+    '内联编辑表格': 'Inline Edit Table',
+    '动态表单生成器': 'Dynamic Form Generator'
   },
   navbar: {
     Home: '',

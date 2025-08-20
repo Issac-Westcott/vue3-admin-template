@@ -215,7 +215,7 @@ const isTextOverflow = (text, maxWidth) => {
 const statusFilter = (status) => {
   const statusMap = {
     '未处理': 'danger',
-    '处理中': 'warning', 
+    '处理中': 'warning',
     '关闭': 'info'
   }
   return statusMap[status]

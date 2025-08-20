@@ -13,85 +13,85 @@
           <!-- 左列 -->
           <div class="detail-column">
             <div class="detail-item">
-              <label class="detail-label">问题标题：</label>
-              <div class="detail-value">{{ questionDetail.question }}</div>
+              <span class="detail-label">问题标题：</span>
+              <span class="detail-value">{{ questionDetail.question }}</span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">问题类别：</label>
-              <div class="detail-value">
+              <span class="detail-label">问题类别：</span>
+              <span class="detail-value">
                 <el-tag type="info">{{ questionDetail.typeValue }}</el-tag>
-              </div>
+              </span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">优先级：</label>
-              <div class="detail-value">
+              <span class="detail-label">优先级：</span>
+              <span class="detail-value">
                 <span v-for="n in +questionDetail.levelValue" :key="n" class="priority-star">★</span>
                 <span class="priority-text">({{ questionDetail.levelValue }}级)</span>
-              </div>
+              </span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">所属条线：</label>
-              <div class="detail-value">{{ questionDetail.lineValue }}</div>
+              <span class="detail-label">所属条线：</span>
+              <span class="detail-value">{{ questionDetail.lineValue }}</span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">所属系统：</label>
-              <div class="detail-value">{{ questionDetail.owningSystem }}</div>
+              <span class="detail-label">所属系统：</span>
+              <span class="detail-value">{{ questionDetail.owningSystem }}</span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">所属项目：</label>
-              <div class="detail-value">{{ questionDetail.project }}</div>
+              <span class="detail-label">所属项目：</span>
+              <span class="detail-value">{{ questionDetail.project }}</span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">关联框架/平台：</label>
-              <div class="detail-value">
+              <span class="detail-label">关联框架/平台：</span>
+              <span class="detail-value">
                 <el-tag type="success">{{ questionDetail.platformValue }}</el-tag>
-              </div>
+              </span>
             </div>
           </div>
           
           <!-- 右列 -->
           <div class="detail-column">
             <div class="detail-item">
-              <label class="detail-label">当前状态：</label>
-              <div class="detail-value">
+              <span class="detail-label">当前状态：</span>
+              <span class="detail-value">
                 <el-tag :type="getStatusType(questionDetail.status)">{{ getStatusText(questionDetail.status) }}</el-tag>
-              </div>
+              </span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">提出人：</label>
-              <div class="detail-value">{{ questionDetail.proposer }}</div>
+              <span class="detail-label">提出人：</span>
+              <span class="detail-value">{{ questionDetail.proposer }}</span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">所属公司：</label>
-              <div class="detail-value">{{ questionDetail.proposerType }}</div>
+              <span class="detail-label">所属公司：</span>
+              <span class="detail-value">{{ questionDetail.proposerType }}</span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">所属部门：</label>
-              <div class="detail-value">{{ questionDetail.proposerDepartment }}</div>
+              <span class="detail-label">所属部门：</span>
+              <span class="detail-value">{{ questionDetail.proposerDepartment }}</span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">解决人：</label>
-              <div class="detail-value">{{ questionDetail.solver || '待分配' }}</div>
+              <span class="detail-label">解决人：</span>
+              <span class="detail-value">{{ questionDetail.solver || '待分配' }}</span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">提出时间：</label>
-              <div class="detail-value">{{ parseTime(questionDetail.createTime) }}</div>
+              <span class="detail-label">提出时间：</span>
+              <span class="detail-value">{{ parseTime(questionDetail.createTime) }}</span>
             </div>
             
             <div class="detail-item">
-              <label class="detail-label">最后更新：</label>
-              <div class="detail-value">{{ parseTime(questionDetail.updateTime || questionDetail.createTime) }}</div>
+              <span class="detail-label">最后更新：</span>
+              <span class="detail-value">{{ parseTime(questionDetail.updateTime || questionDetail.createTime) }}</span>
             </div>
           </div>
         </div>
@@ -364,7 +364,6 @@ onMounted(() => {
 .detail-header {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
   gap: 16px;
 }
 
@@ -380,6 +379,11 @@ onMounted(() => {
   margin: 0 auto;
 }
 
+.detail-header {
+  max-width: 1200px;
+  margin: 0 auto 20px auto;
+}
+
 .detail-card {
   margin-bottom: 20px;
 }
@@ -393,20 +397,24 @@ onMounted(() => {
 .detail-column {
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
 .detail-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 8px;
+  margin-bottom: 20px; /* 调整行间距 */
 }
 
 .detail-label {
   font-weight: bold;
   color: #1f4e79;
   font-size: 14px;
-  margin-bottom: 4px;
+  white-space: nowrap;
+  width: 120px;
+  min-width: 120px;
+  display: inline-block;
 }
 
 .detail-value {
@@ -417,6 +425,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
 }
 
 .priority-star {

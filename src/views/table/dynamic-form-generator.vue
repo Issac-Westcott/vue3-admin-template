@@ -12,21 +12,9 @@
             class="config-selector"
             @change="handleConfigChange"
           >
-            <el-option
-              v-for="config in formConfigs"
-              :key="config.id"
-              :label="config.name"
-              :value="config.id"
-            />
+            <el-option v-for="config in formConfigs" :key="config.id" :label="config.name" :value="config.id" />
           </el-select>
-          <el-button
-            type="primary"
-            size="large"
-            :disabled="!selectedConfigId"
-            @click="refreshForm"
-          >
-            刷新表单
-          </el-button>
+          <el-button type="primary" size="large" :disabled="!selectedConfigId" @click="refreshForm">刷新表单</el-button>
         </div>
       </el-card>
     </div>
@@ -38,12 +26,8 @@
           <div class="card-header">
             <span class="form-title">{{ currentFormTitle }}</span>
             <div class="form-actions">
-              <el-button size="small" @click="viewFormData">
-                查看数据
-              </el-button>
-              <el-button size="small" @click="resetForm">
-                重置表单
-              </el-button>
+              <el-button size="small" @click="viewFormData">查看数据</el-button>
+              <el-button size="small" @click="resetForm">重置表单</el-button>
             </div>
           </div>
         </template>
@@ -58,12 +42,7 @@
           </div>
 
           <div v-else-if="formError" class="error-state">
-            <el-alert
-              title="表单加载失败"
-              :description="formError"
-              type="error"
-              show-icon
-            />
+            <el-alert title="表单加载失败" :description="formError" type="error" show-icon />
           </div>
 
           <div v-else class="form-content">
@@ -80,12 +59,7 @@
     </div>
 
     <!-- 数据预览弹窗 -->
-    <el-dialog
-      v-model="dataDialogVisible"
-      title="表单数据预览"
-      width="60%"
-      :before-close="handleDataDialogClose"
-    >
+    <el-dialog v-model="dataDialogVisible" title="表单数据预览" width="60%" :before-close="handleDataDialogClose">
       <div class="data-preview">
         <el-tabs v-model="activeTab">
           <el-tab-pane label="表单数据" name="formData">
@@ -98,16 +72,14 @@
       </div>
       <template #footer>
         <el-button @click="dataDialogVisible = false">关闭</el-button>
-        <el-button type="primary" @click="copyToClipboard">
-          复制数据
-        </el-button>
+        <el-button type="primary" @click="copyToClipboard">复制数据</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, computed, watch, nextTick } from 'vue'
+<script setup lang="ts">
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import useClipboard from 'vue-clipboard3'
 
@@ -119,13 +91,16 @@ const formLoading = ref(false)
 const formError = ref('')
 const dataDialogVisible = ref(false)
 const activeTab = ref('formData')
+const isSubmitting = ref(false)
 
 // 表单配置选项
 const formOption = reactive({
   submitBtn: {
     text: '提交表单',
     type: 'primary',
-    size: 'large'
+    size: 'large',
+    loading: computed(() => isSubmitting.value),
+    disabled: computed(() => isSubmitting.value)
   },
   resetBtn: {
     text: '重置',
@@ -239,9 +214,7 @@ const formConfigs = ref([
         props: {
           placeholder: '请输入产品名称'
         },
-        validate: [
-          { required: true, message: '请输入产品名称', trigger: 'blur' }
-        ]
+        validate: [{ required: true, message: '请输入产品名称', trigger: 'blur' }]
       },
       {
         type: 'textarea',
@@ -264,9 +237,7 @@ const formConfigs = ref([
           step: 0.01,
           placeholder: '请输入价格'
         },
-        validate: [
-          { required: true, message: '请输入价格', trigger: 'blur' }
-        ]
+        validate: [{ required: true, message: '请输入价格', trigger: 'blur' }]
       },
       {
         type: 'select',
@@ -283,9 +254,7 @@ const formConfigs = ref([
         props: {
           placeholder: '请选择产品分类'
         },
-        validate: [
-          { required: true, message: '请选择产品分类', trigger: 'change' }
-        ]
+        validate: [{ required: true, message: '请选择产品分类', trigger: 'change' }]
       },
       {
         type: 'switch',
@@ -329,9 +298,7 @@ const formConfigs = ref([
         props: {
           placeholder: '请输入您的姓名'
         },
-        validate: [
-          { required: true, message: '请输入姓名', trigger: 'blur' }
-        ]
+        validate: [{ required: true, message: '请输入姓名', trigger: 'blur' }]
       },
       {
         type: 'radio',
@@ -345,9 +312,7 @@ const formConfigs = ref([
           { label: '46-55岁', value: '46-55' },
           { label: '55岁以上', value: '55+' }
         ],
-        validate: [
-          { required: true, message: '请选择年龄段', trigger: 'change' }
-        ]
+        validate: [{ required: true, message: '请选择年龄段', trigger: 'change' }]
       },
       {
         type: 'checkbox',
@@ -389,7 +354,7 @@ const formConfigs = ref([
 
 // 计算属性
 const currentFormTitle = computed(() => {
-  const config = formConfigs.value.find(c => c.id === selectedConfigId.value)
+  const config = formConfigs.value.find((c) => c.id === selectedConfigId.value)
   return config ? config.name : '表单预览'
 })
 
@@ -403,7 +368,7 @@ watch(selectedConfigId, (newId) => {
 })
 
 // 方法定义
-const handleConfigChange = (configId) => {
+const handleConfigChange = (configId: string) => {
   // 由于watch已经监听selectedConfigId的变化，这里不需要重复调用loadFormConfig
   // selectedConfigId的值已经通过v-model自动更新，watch会自动触发loadFormConfig
 }
@@ -414,9 +379,9 @@ const loadFormConfig = async (configId) => {
     formError.value = ''
 
     // 模拟异步加载
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise((resolve) => setTimeout(resolve, 300))
 
-    const config = formConfigs.value.find(c => c.id === configId)
+    const config = formConfigs.value.find((c) => c.id === configId)
     if (!config) {
       throw new Error('未找到对应的表单配置')
     }
@@ -429,7 +394,7 @@ const loadFormConfig = async (configId) => {
     resetFormData()
 
     ElMessage.success('表单加载成功')
-  } catch (error) {
+  } catch (error: any) {
     formError.value = error.message || '加载表单配置失败'
     ElMessage.error(formError.value)
   } finally {
@@ -445,8 +410,33 @@ const resetFormState = () => {
 
 const resetFormData = () => {
   const newData = {}
-  formRule.value.forEach(rule => {
-    newData[rule.field] = rule.value
+  formRule.value.forEach((rule) => {
+    // 根据字段类型设置正确的空值
+    switch ((rule as { type: string }).type) {
+      case 'input':
+      case 'textarea':
+      case 'select':
+      case 'datePicker':
+        newData[(rule as { field: string }).field] = ''
+        break
+      case 'checkbox':
+        newData[(rule as { field: string }).field] = []
+        break
+      case 'radio':
+        newData[(rule as { field: string }).field] = ''
+        break
+      case 'inputNumber':
+      case 'rate':
+      case 'slider':
+        newData[(rule as { field: string }).field] = 0
+        break
+      case 'switch':
+        newData[(rule as { field: string }).field] = false
+        break
+      default:
+        // 对于其他类型，使用rule中定义的初始值
+        newData[(rule as { field: string; value: any }).field] = (rule as { field: string; value: any }).value
+    }
   })
   formData.value = newData
 }
@@ -462,12 +452,23 @@ const resetForm = () => {
   ElMessage.success('表单已重置')
 }
 
-const handleSubmit = (formData) => {
-  console.log('表单提交:', formData)
-  ElMessage.success('表单提交成功！')
+const handleSubmit = async (formData: any) => {
+  try {
+    isSubmitting.value = true
+    console.log('表单提交:', formData)
+
+    // 模拟提交过程
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    ElMessage.success('表单提交成功！')
+  } catch {
+    ElMessage.error('表单提交失败，请重试')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
-const handleFormChange = (field, value, origin, api) => {
+const handleFormChange = (field: string, value: any, origin: any, api: any) => {
   console.log('表单变化:', { field, value })
 }
 
@@ -614,18 +615,18 @@ init()
     align-items: stretch;
     gap: 12px;
   }
-  
+
   .config-selector {
     min-width: auto;
     max-width: none;
   }
-  
+
   .card-header {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
   }
-  
+
   .form-actions {
     justify-content: center;
   }
@@ -695,7 +696,87 @@ init()
 }
 
 :deep(.el-button) {
-  border-radius: 6px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+:deep(.el-button:before) {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+:deep(.el-button:hover:before) {
+  left: 100%;
+}
+
+:deep(.el-button--primary) {
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  border-color: #1976d2;
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+:deep(.el-button--primary:hover) {
+  background: linear-gradient(135deg, #1e88e5 0%, #1976d2 100%);
+  border-color: #1e88e5;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+}
+
+:deep(.el-button--primary:active) {
+  background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+  border-color: #1565c0;
+  color: #ffffff;
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+:deep(.el-button--primary.is-loading) {
+  background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+  border-color: #90caf9;
+  color: #ffffff;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(144, 202, 249, 0.3);
+}
+
+:deep(.el-button--primary:disabled) {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-color: #e3f2fd;
+  color: #9e9e9e;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+:deep(.el-button--primary .el-icon) {
+  transition: transform 0.3s ease;
+}
+
+:deep(.el-button--primary.is-loading .el-icon) {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 :deep(.el-card__body) {

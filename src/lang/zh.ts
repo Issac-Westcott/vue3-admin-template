@@ -41,6 +41,7 @@ export default {
     Excel: 'Excel',
     'Rich Text': '富文本',
     Table: '表格',
+    '动态表单生成器': '动态表单生成器',
     Guid: '使用引导',
     Other: '其他'
   },

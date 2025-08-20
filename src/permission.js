@@ -21,7 +21,10 @@ router.beforeEach(async (to) => {
     if (to.path === '/login') {
       return '/'
     } else {
-      basicStore.setFilterAsyncRoutes([])
+      // 确保路由已经初始化
+      if (basicStore.allRoutes.length === 0) {
+        basicStore.setFilterAsyncRoutes([])
+      }
       return true
     }
   } else {

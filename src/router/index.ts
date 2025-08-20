@@ -181,6 +181,12 @@ export const constantRoutes: RouterTypes = [
         name: 'QuestionDetail',
         meta: { title: '问题详情' },
         hidden: true // 隐藏在菜单中，只能通过编程方式访问
+      },
+      {
+        path: 'dynamic-form-generator',
+        component: () => import('@/views/table/dynamic-form-generator.vue'),
+        name: 'DynamicFormGenerator',
+        meta: { title: '动态表单生成器', icon: 'form' }
       }
     ]
   },

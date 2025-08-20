@@ -8,7 +8,7 @@
 
     <!-- 详情内容 -->
     <div v-if="questionDetail" class="detail-content">
-      <el- class="detail-card">
+      <el-card class="detail-card">
         <div class="detail-grid">
           <!-- 左列 -->
           <div class="detail-column">
@@ -95,9 +95,9 @@
             </div>
           </div>
         </div>
-      </el-
+      </el-card>
       <!-- 问题描述 -->
-      <el- class="detail-card description-card">
+      <el-card class="detail-card description-card">
         <template #header>
           <div class="card-header">
             <span>问题描述</span>
@@ -106,7 +106,7 @@
         <div class="description-content">
           {{ questionDetail.description || '暂无详细描述' }}
         </div>
-      </el-
+      </el-card>
       <!-- 解决方案 -->
       <el-card class="detail-card solution-card">
         <template #header>
@@ -122,8 +122,8 @@
       <!-- 操作按钮 -->
       <div class="action-buttons">
         <el-button type="primary" :icon="Edit" @click="editQuestion">编辑问题</el-button>
-        <el-button type="success" :icon="Check" @click="resolveQuestion" v-if="questionDetail.status === 'pending'">标记为已解决</el-button>
-        <el-button type="warning" :icon="Clock" @click="processQuestion" v-if="questionDetail.status === 'pending'">开始处理</el-button>
+        <el-button v-if="questionDetail.status === 'pending'" type="success" :icon="Check" @click="resolveQuestion">标记为已解决</el-button>
+        <el-button v-if="questionDetail.status === 'pending'" type="warning" :icon="Clock" @click="processQuestion">开始处理</el-button>
       </div>
     </div>
 
@@ -135,10 +135,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft, Edit, Check, Clock } from '@element-plus/icons-vue'
+import { ArrowLeft, Check, Clock, Edit } from '@element-plus/icons-vue'
 import { parseTime } from '@/utils/date-util'
 
 const route = useRoute()

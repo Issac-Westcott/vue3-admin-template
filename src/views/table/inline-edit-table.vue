@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Check, Edit, Refresh } from '@element-plus/icons-vue'
 import { fetchList, updateArticle } from '@/api/article'
 import { parseTime } from '@/utils/date-util'

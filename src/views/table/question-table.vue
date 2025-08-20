@@ -29,8 +29,8 @@
             <el-link
               type="primary"
               class="question-link text-ellipsis"
-              @click="goToDetail(row)"
               :underline="false"
+              @click="goToDetail(row)"
             >
               {{ row.question }}
             </el-link>
@@ -186,9 +186,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Edit, Check, Close, Search } from '@element-plus/icons-vue'
+import { Check, Close, Edit, Search } from '@element-plus/icons-vue'
 import { parseTime } from '@/utils/date-util'
 import { getQuestionList } from '@/api/article'
 

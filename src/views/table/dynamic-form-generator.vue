@@ -458,7 +458,7 @@ const handleSubmit = async (formData: any) => {
     console.log('表单提交:', formData)
 
     // 模拟提交过程
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500))
 
     ElMessage.success('表单提交成功！')
   } catch {
